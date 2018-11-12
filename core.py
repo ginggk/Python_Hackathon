@@ -1,7 +1,8 @@
 class Game:
-    def __init__(self, player: 'Player', _map) -> None:
+    def __init__(self, player: 'Player', _map, state) -> None:
         self.player: Player = player
         self._map = _map
+        self.state = state
 
     def clear_player_spot(self) -> 'Game':
         self.player = self.player.clear_spot()
@@ -98,6 +99,12 @@ class Player:
             return self
 
 
+class Enemy:
+    def __init__(self, name, health):
+        self.name = name
+        self.health = health
+
+
 class Room:
     def __init__(self, items, enemy, build):
         self.items = items
@@ -106,8 +113,9 @@ class Room:
 
 
 def load_map():
-    room_1 = Room([], "enemy", [[2, 2, 2, 2], [2, 0, 1, 2], [2, 0, 2, 2],
-                                [2, 0, 2, 2], [2, 0, 4, 3], [2, 2, 2, 2]])
+    room_1 = Room([], Enemy("Ginger", 100),
+                  [[2, 2, 2, 2], [2, 0, 1, 2], [2, 0, 2, 2], [2, 0, 2, 2],
+                   [2, 0, 4, 3], [2, 2, 2, 2]])
     _map = [room_1]
     return _map
 
