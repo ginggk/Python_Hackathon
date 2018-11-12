@@ -2,26 +2,25 @@ from pybcca.tui_helper import run
 from core import *
 import os
 
+# def player_move(player):
+#     event = input(
+#         "\n[W] Up \n[D] Right \n[A] Left \n[S] Down \nMove: ").lower()
 
-def player_move(player):
-    event = input(
-        "\n[W] Up \n[D] Right \n[A] Left \n[S] Down \nMove: ").lower()
-
-    if event == "w":
-        player.move_north()
-        return player
-    elif event == "s":
-        player.move_south()
-        return player
-    elif event == "a":
-        player.move_west()
-        return player
-    elif event == "d":
-        player.move_east()
-        return player
-    else:
-        print("Invalid move")
-        player_move(player)
+#     if event == "w":
+#         player.move_north()
+#         return player
+#     elif event == "s":
+#         player.move_south()
+#         return player
+#     elif event == "a":
+#         player.move_west()
+#         return player
+#     elif event == "d":
+#         player.move_east()
+#         return player
+#     else:
+#         print("Invalid move")
+#         player_move(player)
 
 
 def update(key, state: Game) -> Game:
@@ -50,19 +49,19 @@ def update(key, state: Game) -> Game:
 
 
 def view(state, x, y):
-    string = '\t'
-    for row in state.player.room:
+    string = f'Use the Arrow keys to move\nPlayer: {state.player.name}\n\n\t'
+    for row in state.player.room.build:
         for cell in row:
             if cell == 0:
-                string += " "
+                string += "   "
             elif cell == 1:
-                string += "P"
+                string += " P "
             elif cell == 2:
-                string += "W"
+                string += "|W|"
             elif cell == 3:
-                string += "E"
+                string += " E "
             elif cell == 4:
-                string += "X"
+                string += " X "
         string += "\n\t"
     return string
 
@@ -70,15 +69,10 @@ def view(state, x, y):
 def main():
     os.system('clear')
     _map = load_map()
-    print(_map)
-    player = Player(100, {'x': 0, 'y': 0}, _map[0])
+    name = input("What is your name: ")
+    player = Player(100, name, {'x': 2, 'y': 1}, _map[0])
 
     run(Game(player, _map), update, view)
-
-    # print(_map)
-    # print(player.location)
-    # player = player_move(player)
-    # print(player.location)
 
 
 if __name__ == "__main__":
