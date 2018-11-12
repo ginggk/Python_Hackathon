@@ -29,17 +29,18 @@ class Game:
 
 
 class Player:
-    def __init__(self, health: int, location, room) -> None:
+    def __init__(self, health: int, name: str, location, room) -> None:
         self.health = health
+        self.name = name
         self.location = location
         self.room = room
 
     def clear_spot(self):
-        self.room[self.location['y']][self.location['x']] = 0
+        self.room.build[self.location['y']][self.location['x']] = 0
         return self
 
     def new_spot(self):
-        self.room[self.location['y']][self.location['x']] = 1
+        self.room.build[self.location['y']][self.location['x']] = 1
         return self
 
     def move(self, x, y):
@@ -50,7 +51,7 @@ class Player:
     def move_north(self):
         y = self.location['y']
         x = self.location['x']
-        place = self.room
+        place = self.room.build
         if y is not 0:
             if place[y - 1][x] == 0:
                 return self.move(x=0, y=-1)
@@ -62,7 +63,7 @@ class Player:
     def move_south(self):
         y = self.location['y']
         x = self.location['x']
-        place = self.room
+        place = self.room.build
         if y is not len(place) - 1:
             if place[y + 1][x] == 0:
                 return self.move(x=0, y=1)
@@ -74,7 +75,7 @@ class Player:
     def move_east(self):
         y = self.location['y']
         x = self.location['x']
-        place = self.room
+        place = self.room.build
         if x is not len(place[y]) - 1:
             if place[y][x + 1] == 0:
                 return self.move(x=1, y=0)
@@ -86,7 +87,7 @@ class Player:
     def move_west(self):
         y = self.location['y']
         x = self.location['x']
-        place = self.room
+        place = self.room.build
         if x is not 0:
             if place[y][x - 1] == 0:
                 return self.move(x=-1, y=0)
@@ -98,13 +99,15 @@ class Player:
 
 
 class Room:
-    def __init__(self, items, enemy):
+    def __init__(self, items, enemy, build):
         self.items = items
         self.enemy = enemy
+        self.build = build
 
 
 def load_map():
-    room_1 = [[1, 0, 2], [0, 0, 2], [0, 2, 2], [0, 2, 2], [0, 4, 3], [0, 2, 0]]
+    room_1 = Room([], "enemy", [[2, 2, 2, 2], [2, 0, 1, 2], [2, 0, 2, 2],
+                                [2, 0, 2, 2], [2, 0, 4, 3], [2, 2, 2, 2]])
     _map = [room_1]
     return _map
 
