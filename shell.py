@@ -56,11 +56,13 @@ def explore_update(key, state: Game) -> Game:
 
 def battle_update(key, state: Game) -> Game:
     if key == "1":
-        state.player_attack()
-        if state.enemy.is_dead():
-            state.state = 'explore'
+        attack(state.player, state.enemy)
 
-        return state
+    elif key == "2":
+        cast_spell(state.player, state.enemy)
+
+    if state.enemy.is_dead():
+        state.state = 'explore'
     return state
 
 
