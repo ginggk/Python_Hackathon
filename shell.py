@@ -9,30 +9,45 @@ def check_space_action(state, direction):
         return state
 
 
+def on_enemy_space_action(state):
+    enemies = state.player.room.enemies
+    enemy = state.player_check_for_enemy(enemies)
+    if enemy is not None:
+        state.state = 'battle'
+        state.enemy = enemy
+    return state
+
+
 def explore_update(key, state: Game) -> Game:
     if key == "KEY_UP":
         state.clear_player_spot()
-        check_space_action(state, 'north')
+        # check_space_action(state, 'north')
         state.move_player_north()
         state.player_new_spot()
+        on_enemy_space_action(state)
+
         return state
     elif key == "KEY_DOWN":
         state.clear_player_spot()
-        check_space_action(state, 'south')
+        # check_space_action(state, 'south')
         state.move_player_south()
         state.player_new_spot()
+        on_enemy_space_action(state)
         return state
     elif key == "KEY_LEFT":
         state.clear_player_spot()
-        check_space_action(state, 'west')
+        # check_space_action(state, 'west')
         state.move_player_west()
         state.player_new_spot()
+        on_enemy_space_action(state)
         return state
     elif key == "KEY_RIGHT":
         state.clear_player_spot()
-        check_space_action(state, 'east')
+        # check_space_action(state, 'east')
         state.move_player_east()
+        on_enemy_space_action(state)
         state.player_new_spot()
+
         return state
     else:
         return state
@@ -41,8 +56,8 @@ def explore_update(key, state: Game) -> Game:
 
 def battle_update(key, state: Game) -> Game:
     if key == "1":
-        state.player_attack(state.player.room.enemy)
-        if state.player.room.enemy.is_dead():
+        state.player_attack()
+        if state.enemy.is_dead():
             state.state = 'explore'
 
         return state
@@ -78,7 +93,7 @@ def explore_view(state, x, y):
 
 def battle_view(state, x, y):
     player = state.player
-    enemy = player.room.enemy
+    enemy = state.enemy
     space = ""
 
     string = ''
