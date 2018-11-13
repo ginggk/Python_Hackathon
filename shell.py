@@ -3,30 +3,35 @@ from core import *
 import os
 
 
+def explore_update(key, state: Game) -> Game:
+    if key == "KEY_UP":
+        state.clear_player_spot()
+        state.move_player_north()
+        state.player_new_spot()
+        return state
+    elif key == "KEY_DOWN":
+        state.clear_player_spot()
+        state.move_player_south()
+        state.player_new_spot()
+        return state
+    elif key == "KEY_LEFT":
+        state.clear_player_spot()
+        state.move_player_west()
+        state.player_new_spot()
+        return state
+    elif key == "KEY_RIGHT":
+        state.clear_player_spot()
+        state.move_player_east()
+        state.player_new_spot()
+        return state
+    else:
+        return state
+    return state
+
+
 def update(key, state: Game) -> Game:
     if state.state == "explore":
-        if key == "KEY_UP":
-            state.clear_player_spot()
-            state.move_player_north()
-            state.player_new_spot()
-            return state
-        elif key == "KEY_DOWN":
-            state.clear_player_spot()
-            state.move_player_south()
-            state.player_new_spot()
-            return state
-        elif key == "KEY_LEFT":
-            state.clear_player_spot()
-            state.move_player_west()
-            state.player_new_spot()
-            return state
-        elif key == "KEY_RIGHT":
-            state.clear_player_spot()
-            state.move_player_east()
-            state.player_new_spot()
-            return state
-        else:
-            return state
+        state = explore_update(key, state)
     # elif state.state = "battle":
 
     return state
@@ -95,7 +100,7 @@ def main():
     name = player_name()
     player = Player(100, name, 100, {'x': 2, 'y': 1}, _map[0])
 
-    run(Game(player, _map, "battle"), update, view)
+    run(Game(player, _map, "explore"), update, view)
 
 
 if __name__ == "__main__":
