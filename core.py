@@ -1,3 +1,6 @@
+from random import randrange
+
+
 class Game:
     def __init__(self, player: 'Player', _map, state) -> None:
         self.player: Player = player
@@ -35,9 +38,6 @@ class Game:
     def player_check_for_enemy(self, enemies):
         return self.player.check_for_enemy(enemies)
 
-    def player_attack(self):
-        return self.player.attack(self.enemy)
-
 
 class Player:
     def __init__(self, health: int, name: str, magic, location, room) -> None:
@@ -46,7 +46,7 @@ class Player:
         self.magic = magic
         self.base_attack = 5
         self.weapon = "None"
-        self.spell = "None"
+        self.spell = "Firepuff"
         self.armor = "None"
         self.location = location
         self.room = room
@@ -60,11 +60,6 @@ class Player:
                 'potions': []
             }
         }
-
-    def attack(self, enemy):
-        attack = (self.base_attack * self.weapon['multiplier'])
-        enemy.health -= (attack - enemy.armor['defense'])
-        return self
 
     def clear_spot(self):
         self.room.build[self.location['y']][self.location['x']] = 0
@@ -201,7 +196,8 @@ def get_armor(name):
 
 def load_weapons():
     none = {'name': 'none', 'multiplier': 1, 'sharpness': 0}
-    weapons = [none]
+    broken_dagger = {'name': 'Broken Dagger', 'multiplier': 1.2}
+    weapons = [none, broken_dagger]
     return weapons
 
 
@@ -213,7 +209,6 @@ def get_weapon(name):
 
 
 def load_map():
-
     room_1 = Room([], [
         Enemy("Ginger", 100, 100, get_weapon('none'), "None",
               get_armor('none'), {
@@ -224,6 +219,23 @@ def load_map():
         [2, 2, 2, 2]])
     _map = [room_1]
     return _map
+
+
+def attack(player, enemy):
+    attack = (player.base_attack * player.weapon['multiplier'])
+    enemy.health -= (attack - enemy.armor['defense'])
+    return player
+
+
+def cast_spell(player, enemy):
+    if player.spell == 'Firepuff':
+        enemy.health -= randrange(5, 10)
+        player.magic -= 10
+
+
+def equip_weapon(player, index):
+    if index <= len(player.inventory['weapons']):
+        player.weapon = player.inventory['weapons'][index - 1]
 
 
 def draw_room(room):

@@ -56,11 +56,25 @@ def explore_update(key, state: Game) -> Game:
 
 def battle_update(key, state: Game) -> Game:
     if key == "1":
-        state.player_attack()
-        if state.enemy.is_dead():
-            state.state = 'explore'
+        attack(state.player, state.enemy)
+    elif key == "2":
+        cast_spell(state.player, state.enemy)
 
-        return state
+    elif key == "3":
+        state.state = "weapon_menu"
+
+    if state.enemy.is_dead():
+        state.state = 'explore'
+    return state
+
+
+def weapon_menu_update(key, state):
+    if key == "1":
+        equip_weapon(state.player, 1)
+        state.state = "battle"
+    elif key == "2":
+        equip_weapon(state.player, 2)
+        state.state = "battle"
     return state
 
 
@@ -69,6 +83,8 @@ def update(key, state: Game) -> Game:
         state = explore_update(key, state)
     elif state.state == "battle":
         state = battle_update(key, state)
+    elif state.state == "weapon_menu":
+        state = weapon_menu_update(key, state)
 
     return state
 
@@ -100,7 +116,7 @@ def battle_view(state, x, y):
 
     str_names = '\t|| {:6} || {:<10} || {} ||'.format(player.name, space,
                                                       enemy.name)
-    str_health = '\n\tHealth: {:<3}{:<13}Health: {:<3}'.format(
+    str_health = '\n\tHealth: {:.2f}{:<10}Health: {:.2f}'.format(
         player.health, space, enemy.health)
     str_magic = '\n\tMagic Core: {:<3}{:<9}Magic Core: {:<3}'.format(
         player.magic, space, enemy.magic)
@@ -114,11 +130,24 @@ def battle_view(state, x, y):
     return string + str_names + str_health + str_magic + str_weapons + str_spell + str_armor
 
 
+def weapon_menu_view(state, x, y):
+    string = 'Choose Your Current Weapon\n'
+    counter = 1
+
+    for weapon in state.player.inventory['weapons']:
+        new_str = f'{counter}: {weapon["name"]}\n'
+        counter += 1
+        string += new_str
+    return string
+
+
 def view(state, x, y):
     if state.state == "explore":
         string = explore_view(state, x, y)
     elif state.state == "battle":
         string = battle_view(state, x, y)
+    elif state.state == "weapon_menu":
+        string = weapon_menu_view(state, x, y)
     return string
 
 
@@ -136,8 +165,10 @@ def main():
     os.system('clear')
     _map = load_map()
     name = player_name()
-    player = Player(100, name, 100, {'x': 2, 'y': 1}, _map[0])
+    player = Player(100.00, name, 100, {'x': 2, 'y': 1}, _map[0])
     player.weapon = get_weapon('none')
+    player.inventory['weapons'].append(get_weapon('none'))
+    player.inventory['weapons'].append(get_weapon('Broken Dagger'))
     player.armor = get_armor('none')
 
     run(Game(player, _map, "explore"), update, view)
