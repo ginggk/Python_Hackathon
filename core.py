@@ -196,7 +196,8 @@ def get_armor(name):
 
 def load_weapons():
     none = {'name': 'none', 'multiplier': 1, 'sharpness': 0}
-    weapons = [none]
+    broken_dagger = {'name': 'Broken Dagger', 'multiplier': 1.2}
+    weapons = [none, broken_dagger]
     return weapons
 
 
@@ -230,6 +231,11 @@ def cast_spell(player, enemy):
     if player.spell == 'Firepuff':
         enemy.health -= randrange(5, 10)
         player.magic -= 10
+
+
+def equip_weapon(player, index):
+    if index <= len(player.inventory['weapons']):
+        player.weapon = player.inventory['weapons'][index - 1]
 
 
 def draw_room(room):
