@@ -79,11 +79,13 @@ def battle_view(state, x, y):
     str_magic = '\n\tMagic Core: {:<3}{:<9}Magic Core: {:<3}'.format(
         player.magic, space, enemy.magic)
     str_weapons = '\n\tWeapon: {:<13}{:<3}Weapon: {:<13}'.format(
-        player.weapon, space, enemy.weapon)
+        player.weapon['name'], space, enemy.weapon['name'])
     str_spell = '\n\tSpell: {:<13}{:<4}Spell: {:<13}'.format(
         player.spell, space, enemy.spell)
+    str_armor = '\n\tArmor: {:<13}{:<4}Armor: {:<13}'.format(
+        player.armor['name'], space, enemy.armor['name'])
 
-    return string + str_names + str_health + str_magic + str_weapons + str_spell
+    return string + str_names + str_health + str_magic + str_weapons + str_spell + str_armor
 
 
 def view(state, x, y):
@@ -109,6 +111,8 @@ def main():
     _map = load_map()
     name = player_name()
     player = Player(100, name, 100, {'x': 2, 'y': 1}, _map[0])
+    player.weapon = get_weapon('none')
+    player.armor = get_armor('none')
 
     run(Game(player, _map, "explore"), update, view)
 

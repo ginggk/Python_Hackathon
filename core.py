@@ -31,16 +31,36 @@ class Game:
         self.player = self.player.move_east()
         return self
 
+    def player_attack(self, enemy):
+        return self.player_attack(self, enemy)
+
 
 class Player:
     def __init__(self, health: int, name: str, magic, location, room) -> None:
         self.health = health
         self.name = name
         self.magic = magic
+        self.base_attack = 5
         self.weapon = "None"
         self.spell = "None"
+        self.armor = "None"
         self.location = location
         self.room = room
+        self.inventory = {
+            'gold': 0,
+            'weapons': [],
+            'armors': [],
+            'spell-book': [],
+            'items': {
+                'keys': [],
+                'potions': []
+            }
+        }
+
+    def attack(self, enemy):
+        attack = (self.base_attack * self.weapon.multiplier)
+        enemy.health -= (attack - enemy.armor.defense)
+        return self
 
     def clear_spot(self):
         self.room.build[self.location['y']][self.location['x']] = 0
@@ -127,12 +147,13 @@ class Player:
 
 
 class Enemy:
-    def __init__(self, name, health, magic, weapon, spell):
+    def __init__(self, name, health, magic, weapon, spell, armor):
         self.name = name
         self.health = health
         self.magic = magic
         self.weapon = weapon
         self.spell = spell
+        self.armor = armor
 
 
 class Room:
@@ -142,8 +163,39 @@ class Room:
         self.build = build
 
 
+def load_armor():
+    none = {'name': "none", 'defense': 0}
+    armors = [none]
+    return armors
+
+
+def get_armor(name):
+    armors = load_armor()
+    for armor in armors:
+        if armor['name'] == name:
+            return armor
+        else:
+            break
+
+
+def load_weapons():
+    none = {'name': 'none', 'multipier': 1, 'sharpness': 0}
+    weapons = [none]
+    return weapons
+
+
+def get_weapon(name):
+    weapons = load_weapons()
+    for weapon in weapons:
+        if weapon['name'] == name:
+            return weapon
+
+
 def load_map():
-    room_1 = Room([], Enemy("Ginger", 100, 100, "None", "None"),
+
+    room_1 = Room([],
+                  Enemy("Ginger", 100, 100, get_weapon('none'), "None",
+                        get_armor('none')),
                   [[2, 2, 2, 2], [2, 0, 1, 2], [2, 0, 2, 2], [2, 0, 2, 2],
                    [2, 0, 4, 3], [2, 2, 2, 2]])
     _map = [room_1]
