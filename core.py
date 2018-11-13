@@ -30,9 +30,12 @@ class Game:
 
 
 class Player:
-    def __init__(self, health: int, name: str, location, room) -> None:
+    def __init__(self, health: int, name: str, magic, location, room) -> None:
         self.health = health
         self.name = name
+        self.magic = magic
+        self.weapon = "None"
+        self.spell = "None"
         self.location = location
         self.room = room
 
@@ -100,9 +103,12 @@ class Player:
 
 
 class Enemy:
-    def __init__(self, name, health):
+    def __init__(self, name, health, magic, weapon, spell):
         self.name = name
         self.health = health
+        self.magic = magic
+        self.weapon = weapon
+        self.spell = spell
 
 
 class Room:
@@ -113,7 +119,7 @@ class Room:
 
 
 def load_map():
-    room_1 = Room([], Enemy("Ginger", 100),
+    room_1 = Room([], Enemy("Ginger", 100, 100, "None", "None"),
                   [[2, 2, 2, 2], [2, 0, 1, 2], [2, 0, 2, 2], [2, 0, 2, 2],
                    [2, 0, 4, 3], [2, 2, 2, 2]])
     _map = [room_1]
