@@ -32,7 +32,7 @@ class Game:
         return self
 
     def player_attack(self, enemy):
-        return self.player_attack(self, enemy)
+        return self.player.attack(enemy)
 
 
 class Player:
@@ -58,8 +58,8 @@ class Player:
         }
 
     def attack(self, enemy):
-        attack = (self.base_attack * self.weapon.multiplier)
-        enemy.health -= (attack - enemy.armor.defense)
+        attack = (self.base_attack * self.weapon['multiplier'])
+        enemy.health -= (attack - enemy.armor['defense'])
         return self
 
     def clear_spot(self):
@@ -155,6 +155,13 @@ class Enemy:
         self.spell = spell
         self.armor = armor
 
+    def is_dead(self):
+        if self.health <= 0:
+            self.health = 0
+            return True
+        else:
+            return False
+
 
 class Room:
     def __init__(self, items, enemy, build):
@@ -179,7 +186,7 @@ def get_armor(name):
 
 
 def load_weapons():
-    none = {'name': 'none', 'multipier': 1, 'sharpness': 0}
+    none = {'name': 'none', 'multiplier': 1, 'sharpness': 0}
     weapons = [none]
     return weapons
 
