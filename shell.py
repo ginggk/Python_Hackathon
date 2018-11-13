@@ -39,10 +39,21 @@ def explore_update(key, state: Game) -> Game:
     return state
 
 
+def battle_update(key, state: Game) -> Game:
+    if key == "1":
+        state.player_attack(state.player.room.enemy)
+        if state.player.room.enemy.is_dead():
+            state.state = 'explore'
+
+        return state
+    return state
+
+
 def update(key, state: Game) -> Game:
     if state.state == "explore":
         state = explore_update(key, state)
-    # elif state.state = "battle":
+    elif state.state == "battle":
+        state = battle_update(key, state)
 
     return state
 
