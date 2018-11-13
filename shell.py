@@ -3,24 +3,34 @@ from core import *
 import os
 
 
+def check_space_action(state, direction):
+    if state.player_check_space(direction) == 'enemy':
+        state.state = "battle"
+        return state
+
+
 def explore_update(key, state: Game) -> Game:
     if key == "KEY_UP":
         state.clear_player_spot()
+        check_space_action(state, 'north')
         state.move_player_north()
         state.player_new_spot()
         return state
     elif key == "KEY_DOWN":
         state.clear_player_spot()
+        check_space_action(state, 'south')
         state.move_player_south()
         state.player_new_spot()
         return state
     elif key == "KEY_LEFT":
         state.clear_player_spot()
+        check_space_action(state, 'west')
         state.move_player_west()
         state.player_new_spot()
         return state
     elif key == "KEY_RIGHT":
         state.clear_player_spot()
+        check_space_action(state, 'east')
         state.move_player_east()
         state.player_new_spot()
         return state
