@@ -8,6 +8,9 @@ class Game:
         self.player = self.player.clear_spot()
         return self
 
+    def player_check_space(self, direction):
+        return self.player.check_space(direction)
+
     def player_new_spot(self) -> "Game":
         self.player = self.player.new_spot()
         return self
@@ -46,6 +49,27 @@ class Player:
     def new_spot(self):
         self.room.build[self.location['y']][self.location['x']] = 1
         return self
+
+    #checks the direction from the player using
+    # 'north', 'east', 'south', or 'west'
+    # to return a string value of what is there
+    def check_space(self, direction):
+        y = self.location['y']
+        x = self.location['x']
+        place = self.room.build
+
+        if direction == "north":
+            if place[y - 1][x] == 4:
+                return "enemy"
+        elif direction == "south":
+            if place[y + 1][x] == 4:
+                return 'enemy'
+        elif direction == "east":
+            if place[y][x + 1] == 4:
+                return 'enemy'
+        elif direction == "west":
+            if place[y][x - 1] == 4:
+                return 'enemy'
 
     def move(self, x, y):
         self.location['x'] += x
