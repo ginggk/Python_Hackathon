@@ -8,6 +8,9 @@ class Game:
         self.player = self.player.clear_spot()
         return self
 
+    def player_check_space(self, direction):
+        return self.player.check_space(direction)
+
     def player_new_spot(self) -> "Game":
         self.player = self.player.new_spot()
         return self
@@ -30,9 +33,12 @@ class Game:
 
 
 class Player:
-    def __init__(self, health: int, name: str, location, room) -> None:
+    def __init__(self, health: int, name: str, magic, location, room) -> None:
         self.health = health
         self.name = name
+        self.magic = magic
+        self.weapon = "None"
+        self.spell = "None"
         self.location = location
         self.room = room
 
@@ -43,6 +49,27 @@ class Player:
     def new_spot(self):
         self.room.build[self.location['y']][self.location['x']] = 1
         return self
+
+    #checks the direction from the player using
+    # 'north', 'east', 'south', or 'west'
+    # to return a string value of what is there
+    def check_space(self, direction):
+        y = self.location['y']
+        x = self.location['x']
+        place = self.room.build
+
+        if direction == "north":
+            if place[y - 1][x] == 4:
+                return "enemy"
+        elif direction == "south":
+            if place[y + 1][x] == 4:
+                return 'enemy'
+        elif direction == "east":
+            if place[y][x + 1] == 4:
+                return 'enemy'
+        elif direction == "west":
+            if place[y][x - 1] == 4:
+                return 'enemy'
 
     def move(self, x, y):
         self.location['x'] += x
@@ -100,9 +127,12 @@ class Player:
 
 
 class Enemy:
-    def __init__(self, name, health):
+    def __init__(self, name, health, magic, weapon, spell):
         self.name = name
         self.health = health
+        self.magic = magic
+        self.weapon = weapon
+        self.spell = spell
 
 
 class Room:
@@ -113,7 +143,7 @@ class Room:
 
 
 def load_map():
-    room_1 = Room([], Enemy("Ginger", 100),
+    room_1 = Room([], Enemy("Ginger", 100, 100, "None", "None"),
                   [[2, 2, 2, 2], [2, 0, 1, 2], [2, 0, 2, 2], [2, 0, 2, 2],
                    [2, 0, 4, 3], [2, 2, 2, 2]])
     _map = [room_1]

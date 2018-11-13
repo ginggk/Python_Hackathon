@@ -2,51 +2,46 @@ from pybcca.tui_helper import run
 from core import *
 import os
 
-# def player_move(player):
-#     event = input(
-#         "\n[W] Up \n[D] Right \n[A] Left \n[S] Down \nMove: ").lower()
 
-#     if event == "w":
-#         player.move_north()
-#         return player
-#     elif event == "s":
-#         player.move_south()
-#         return player
-#     elif event == "a":
-#         player.move_west()
-#         return player
-#     elif event == "d":
-#         player.move_east()
-#         return player
-#     else:
-#         print("Invalid move")
-#         player_move(player)
+def check_space_action(state, direction):
+    if state.player_check_space(direction) == 'enemy':
+        state.state = "battle"
+        return state
+
+
+def explore_update(key, state: Game) -> Game:
+    if key == "KEY_UP":
+        state.clear_player_spot()
+        check_space_action(state, 'north')
+        state.move_player_north()
+        state.player_new_spot()
+        return state
+    elif key == "KEY_DOWN":
+        state.clear_player_spot()
+        check_space_action(state, 'south')
+        state.move_player_south()
+        state.player_new_spot()
+        return state
+    elif key == "KEY_LEFT":
+        state.clear_player_spot()
+        check_space_action(state, 'west')
+        state.move_player_west()
+        state.player_new_spot()
+        return state
+    elif key == "KEY_RIGHT":
+        state.clear_player_spot()
+        check_space_action(state, 'east')
+        state.move_player_east()
+        state.player_new_spot()
+        return state
+    else:
+        return state
+    return state
 
 
 def update(key, state: Game) -> Game:
     if state.state == "explore":
-        if key == "KEY_UP":
-            state.clear_player_spot()
-            state.move_player_north()
-            state.player_new_spot()
-            return state
-        elif key == "KEY_DOWN":
-            state.clear_player_spot()
-            state.move_player_south()
-            state.player_new_spot()
-            return state
-        elif key == "KEY_LEFT":
-            state.clear_player_spot()
-            state.move_player_west()
-            state.player_new_spot()
-            return state
-        elif key == "KEY_RIGHT":
-            state.clear_player_spot()
-            state.move_player_east()
-            state.player_new_spot()
-            return state
-        else:
-            return state
+        state = explore_update(key, state)
     # elif state.state = "battle":
 
     return state
@@ -75,9 +70,20 @@ def battle_view(state, x, y):
     enemy = player.room.enemy
     space = ""
 
-    string = '\t|| {:6} || {:<10} || {} ||\n\tHealth: {}{:<13}Health: {}'.format(
-        player.name, space, enemy.name, player.health, space, enemy.health)
-    return string
+    string = ''
+
+    str_names = '\t|| {:6} || {:<10} || {} ||'.format(player.name, space,
+                                                      enemy.name)
+    str_health = '\n\tHealth: {:<3}{:<13}Health: {:<3}'.format(
+        player.health, space, enemy.health)
+    str_magic = '\n\tMagic Core: {:<3}{:<9}Magic Core: {:<3}'.format(
+        player.magic, space, enemy.magic)
+    str_weapons = '\n\tWeapon: {:<13}{:<3}Weapon: {:<13}'.format(
+        player.weapon, space, enemy.weapon)
+    str_spell = '\n\tSpell: {:<13}{:<4}Spell: {:<13}'.format(
+        player.spell, space, enemy.spell)
+
+    return string + str_names + str_health + str_magic + str_weapons + str_spell
 
 
 def view(state, x, y):
@@ -102,7 +108,7 @@ def main():
     os.system('clear')
     _map = load_map()
     name = player_name()
-    player = Player(100, name, {'x': 2, 'y': 1}, _map[0])
+    player = Player(100, name, 100, {'x': 2, 'y': 1}, _map[0])
 
     run(Game(player, _map, "explore"), update, view)
 
