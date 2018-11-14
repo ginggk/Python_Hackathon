@@ -47,7 +47,7 @@ class Player:
         self.base_attack = 5
         self.weapon = "None"
         self.spell = "Firepuff"
-        self.armor = "None"
+        self.armor = "none"
         self.location = location
         self.room = room
         self.inventory = {
@@ -181,7 +181,8 @@ class Room:
 
 def load_armor():
     none = {'name': "none", 'defense': 0}
-    armors = [none]
+    leather = {'name': "Leather", 'defense': 1}
+    armors = [none, leather]
     return armors
 
 
@@ -190,8 +191,6 @@ def get_armor(name):
     for armor in armors:
         if armor['name'] == name:
             return armor
-        else:
-            break
 
 
 def load_weapons():
@@ -236,6 +235,11 @@ def cast_spell(player, enemy):
 def equip_weapon(player, index):
     if index <= len(player.inventory['weapons']):
         player.weapon = player.inventory['weapons'][index - 1]
+
+
+def equip_armor(player, index):
+    if index <= len(player.inventory['armors']):
+        player.armor = player.inventory['armors'][index - 1]
 
 
 def draw_room(room):

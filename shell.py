@@ -62,6 +62,8 @@ def battle_update(key, state: Game) -> Game:
 
     elif key == "3":
         state.state = "weapon_menu"
+    elif key == '4':
+        state.state = 'armor_menu'
 
     if state.enemy.is_dead():
         state.state = 'explore'
@@ -78,6 +80,16 @@ def weapon_menu_update(key, state):
     return state
 
 
+def armor_menu_update(key, state):
+    if key == '1':
+        equip_armor(state.player, 1)
+        state.state = "battle"
+    elif key == '2':
+        equip_armor(state.player, 2)
+        state.state = 'battle'
+    return state
+
+
 def update(key, state: Game) -> Game:
     if state.state == "explore":
         state = explore_update(key, state)
@@ -85,6 +97,8 @@ def update(key, state: Game) -> Game:
         state = battle_update(key, state)
     elif state.state == "weapon_menu":
         state = weapon_menu_update(key, state)
+    elif state.state == 'armor_menu':
+        state = armor_menu_update(key, state)
 
     return state
 
@@ -141,6 +155,17 @@ def weapon_menu_view(state, x, y):
     return string
 
 
+def armor_menu_view(state, x, y):
+    string = 'Choose Your Current Armor\n'
+    counter = 1
+
+    for armor in state.player.inventory['armors']:
+        new_str = f'{counter}: {armor["name"]}\n'
+        counter += 1
+        string += new_str
+    return string
+
+
 def view(state, x, y):
     if state.state == "explore":
         string = explore_view(state, x, y)
@@ -148,6 +173,8 @@ def view(state, x, y):
         string = battle_view(state, x, y)
     elif state.state == "weapon_menu":
         string = weapon_menu_view(state, x, y)
+    elif state.state == 'armor_menu':
+        string = armor_menu_view(state, x, y)
     return string
 
 
@@ -169,7 +196,9 @@ def main():
     player.weapon = get_weapon('none')
     player.inventory['weapons'].append(get_weapon('none'))
     player.inventory['weapons'].append(get_weapon('Broken Dagger'))
-    player.armor = get_armor('none')
+    player.armor = get_armor('Leather')
+    player.inventory['armors'].append(get_armor('none'))
+    player.inventory['armors'].append(get_armor('Leather'))
 
     run(Game(player, _map, "explore"), update, view)
 
