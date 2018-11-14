@@ -6,15 +6,26 @@ import os
 def check_space_action(state, direction):
     if state.player_check_space(direction) == 'exit':
         state.state = 'explore'
-        change_room(state)
+        change_room(state, 'exit')
         return state
+    elif state.player_check_space(direction) == 'entrance':
+        state.state = 'explore'
+        change_room(state, 'entrance')
+        return state
+    #fix player movement
 
 
-def change_room(state):
-    state.map_index += 1
-    index = state.map_index
-    state.player.room = state._map[index]
-    state.player.location = state.player.room.player_start
+def change_room(state, door_type):
+    if door_type == "exit":
+        state.map_index += 1
+        index = state.map_index
+        state.player.room = state._map[index]
+        state.player.location = state.player.room.player_start
+    elif door_type == "entrance":
+        state.map_index -= 1
+        index = state.map_index
+        state.player.room = state._map[index]
+        state.player.location = state.player.room.through_exit
 
 
 def on_enemy_space_action(state):
@@ -27,6 +38,7 @@ def on_enemy_space_action(state):
 
 
 def explore_update(key, state: Game) -> Game:
+    #needs improvement when changing rooms
     if key == "KEY_UP":
         state.clear_player_spot()
         check_space_action(state, 'north')
@@ -65,8 +77,10 @@ def explore_update(key, state: Game) -> Game:
 def battle_update(key, state: Game) -> Game:
     if key == "1":
         attack(state.player, state.enemy)
+        enemy_decision(state.enemy, state.player)
     elif key == "2":
         cast_spell(state.player, state.enemy)
+        enemy_decision(state.enemy, state.player)
 
     elif key == "3":
         state.state = "weapon_menu"
@@ -136,9 +150,11 @@ def explore_view(state, x, y):
             elif cell == 2:
                 string += "|W|"
             elif cell == 3:
-                string += " E "
+                string += "[ ]"
             elif cell == 4:
                 string += " X "
+            elif cell == 5:
+                string += "[ ]"
         string += "\n\t"
     return string
 
@@ -159,7 +175,7 @@ def battle_view(state, x, y):
     str_weapons = '\n\tWeapon: {:<13}{:<3}Weapon: {:<13}'.format(
         player.weapon['name'], space, enemy.weapon['name'])
     str_spell = '\n\tSpell: {:<13}{:<4}Spell: {:<13}'.format(
-        player.spell, space, enemy.spell)
+        player.spell['name'], space, enemy.spell['name'])
     str_armor = '\n\tArmor: {:<13}{:<4}Armor: {:<13}'.format(
         player.armor['name'], space, enemy.armor['name'])
 
@@ -193,7 +209,7 @@ def spell_menu_view(state, x, y):
     counter = 1
 
     for spell in state.player.inventory['spell-book']:
-        new_str = f'{counter}: {spell}\n'
+        new_str = f'{counter}: {spell["name"]}\n'
         counter += 1
         string += new_str
     return string
