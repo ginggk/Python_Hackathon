@@ -5,6 +5,7 @@ class Game:
     def __init__(self, player: 'Player', _map, state) -> None:
         self.player: Player = player
         self._map = _map
+        self.map_index = 0
         self.state = state
         self.enemy = None
 
@@ -39,6 +40,12 @@ class Game:
         return self.player.check_for_enemy(enemies)
 
 
+class Item:
+    def __init__(self, name, classify):
+        self.name = name
+        self.classify = classify
+
+
 class Player:
     def __init__(self, health: int, name: str, magic, location, room) -> None:
         self.health = health
@@ -54,7 +61,7 @@ class Player:
             'gold': 0,
             'weapons': [],
             'armors': [],
-            'spell-book': [],
+            'spell-book': ['Firepuff', 'Ice-Chill'],
             'items': {
                 'keys': [],
                 'potions': []
@@ -78,17 +85,17 @@ class Player:
         place = self.room.build
 
         if direction == "north":
-            if place[y - 1][x] == 4:
-                return "enemy"
+            if place[y - 1][x] == 3:
+                return "exit"
         elif direction == "south":
-            if place[y + 1][x] == 4:
-                return 'enemy'
+            if place[y + 1][x] == 3:
+                return 'exit'
         elif direction == "east":
-            if place[y][x + 1] == 4:
-                return 'enemy'
+            if place[y][x + 1] == 3:
+                return 'exit'
         elif direction == "west":
-            if place[y][x - 1] == 4:
-                return 'enemy'
+            if place[y][x - 1] == 3:
+                return 'exit'
 
     def check_for_enemy(self, enemies):
         for enemy in enemies:
@@ -173,8 +180,8 @@ class Enemy:
 
 
 class Room:
-    def __init__(self, items, enemies, build):
-        self.items = items
+    def __init__(self, player_start, enemies, build):
+        self.player_start = player_start
         self.enemies = enemies
         self.build = build
 
@@ -208,7 +215,11 @@ def get_weapon(name):
 
 
 def load_map():
-    room_1 = Room([], [
+
+    room_1 = Room({
+        'x': 2,
+        'y': 1
+    }, [
         Enemy("Ginger", 100, 100, get_weapon('none'), "None",
               get_armor('none'), {
                   'x': 2,
@@ -216,7 +227,13 @@ def load_map():
               })
     ], [[2, 2, 2, 2], [2, 0, 1, 2], [2, 0, 2, 2], [2, 0, 2, 2], [2, 0, 4, 3],
         [2, 2, 2, 2]])
-    _map = [room_1]
+
+    room_2 = Room({
+        'x': 0,
+        'y': 2
+    }, [], [[2, 2, 2, 2, 2, 2], [2, 2, 0, 0, 0, 2], [3, 0, 0, 0, 0, 2],
+            [2, 2, 0, 0, 4, 2], [2, 2, 2, 2, 3, 2]])
+    _map = [room_1, room_2]
     return _map
 
 
@@ -230,6 +247,9 @@ def cast_spell(player, enemy):
     if player.spell == 'Firepuff':
         enemy.health -= randrange(5, 10)
         player.magic -= 10
+    elif player.spell == "Ice-Chill":
+        enemy.health -= 8
+        player.magic -= 10
 
 
 def equip_weapon(player, index):
@@ -240,6 +260,11 @@ def equip_weapon(player, index):
 def equip_armor(player, index):
     if index <= len(player.inventory['armors']):
         player.armor = player.inventory['armors'][index - 1]
+
+
+def equip_spell(player, index):
+    if index <= len(player.inventory['spell-book']):
+        player.spell = player.inventory['spell-book'][index - 1]
 
 
 def draw_room(room):
