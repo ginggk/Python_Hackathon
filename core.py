@@ -23,6 +23,8 @@ class Game:
         enemy_cast_msg = '{} casted {}\n'.format(enemy.name,
                                                  enemy.spell['name'])
         player_cast_msg = 'You casted {}'.format(self.player.spell['name'])
+        enemy_rest_msg = '{} rested'.format(enemy.name)
+        player_rest_msg = 'You rested'
 
         if action == 'enemy-attack':
             self.battle_log.append(enemy_attack_msg)
@@ -32,6 +34,10 @@ class Game:
             self.battle_log.append(enemy_cast_msg)
         elif action == 'player-cast':
             self.battle_log.append(player_cast_msg)
+        elif action == 'enemy-rest':
+            self.battle_log.append(enemy_rest_msg)
+        elif action == 'player-rest':
+            self.battle_log.append(player_rest_msg)
 
         self.fix_log_length()
         return self
@@ -54,18 +60,15 @@ class Game:
         return self.player.check_for_enemy(enemies)
 
 
-class Item:
-    def __init__(self, name, classify):
-        self.name = name
-        self.classify = classify
-
-
 class Player:
     def __init__(self, health: int, name: str, magic, location, room) -> None:
         self.health = health
+        self.max_health = 100
+        self.max_magic = 100
         self.name = name
         self.magic = magic
         self.base_attack = 5
+        self.magic_refill = 10
         self.weapon = "None"
         self.spell = {'name': 'Firepuff', 'cost': 10}
         self.armor = "none"
@@ -210,17 +213,21 @@ class Player:
 
 
 class Enemy:
-    def __init__(self, name, health, magic, base_attack, weapon, spell, armor,
-                 location):
+    def __init__(self, name, health, magic, magic_refill, base_attack, weapon,
+                 spell, armor, location, loot):
         self.name = name
         self.health = health
+        self.max_health = health
+        self.max_magic = magic
         self.magic = magic
+        self.magic_refill = magic_refill
         self.base_attack = base_attack
         self.weapon = weapon
         self.spell = spell
         self.armor = armor
         self.location = location
         self.dead = False
+        self.loot = loot
 
     def is_dead(self):
         if self.health <= 0:
@@ -236,6 +243,12 @@ class Room:
         self.through_exit = through_exit  #determines where the player is if they go come back through the exit door
         self.enemies = enemies
         self.build = build
+
+
+class Item:
+    def __init__(self, name, classify):
+        self.name = name
+        self.classify = classify
 
 
 def load_map():
@@ -258,14 +271,18 @@ def build_room_1():
 
     _exit = {'x': 2, 'y': 4}
 
+    enemy_weapon = get_weapon('Broken Dagger')
+    enemy_armor = get_armor("Leather")
+
     enemies = [
-        Enemy("Ginger", 100, 100, 5, get_weapon('none'), {
+        Enemy("Ginger", 100, 100, 10, 3, enemy_weapon, {
             'name': 'Firepuff',
             'cost': 10
         }, get_armor('none'), {
             'x': 2,
             'y': 4
-        })
+        }, [{'name': 'Gold', 'value': 10}, {'name': enemy_weapon['name'], 'value': enemy_weapon},
+            {'name': enemy_armor['name'], 'value': enemy_armor}])
     ]
 
     build = [
@@ -334,6 +351,14 @@ def attack(player, enemy):
     return player
 
 
+def rest(player):
+    if player.magic is not player.max_magic:
+        player.magic += player.magic_refill
+        if player.magic > player.max_magic:
+            player.magic = player.max_magic
+    return player
+
+
 def load_spells():
     firepuff = {'name': 'Firepuff', 'cost': 10}
     ice_chill = {'name': "Ice-Chill", 'cost': 10}
@@ -344,6 +369,9 @@ def enemy_decision(enemy, player, state):
     if enemy.magic > enemy.spell['cost'] and num < 5:
         cast_spell(enemy, player)
         state.update_battle_log('enemy-cast')
+    elif enemy.magic < enemy.spell['cost'] and num > 5:
+        rest(enemy)
+        state.update_battle_log('enemy-rest')
     else:
         attack(enemy, player)
         state.update_battle_log('enemy-attack')
@@ -373,3 +401,30 @@ def equip_armor(player, index):
 def equip_spell(player, index):
     if index <= len(player.inventory['spell-book']):
         player.spell = player.inventory['spell-book'][index - 1]
+
+
+def loot(player, enemy, index):
+    if index <= len(enemy.loot):
+        if index == 1:
+            if enemy.loot[index -1]['value'] is not "Empty":
+                player.inventory['gold'] += enemy.loot[index - 1]['value']
+                enemy.loot[index - 1]['value'] = "Empty"
+            
+        elif index == 2:
+            if enemy.loot[index -1]['name'] is not "Empty":
+                if len(player.inventory['weapons']) < 9:
+                    player.inventory['weapons'].append(enemy.loot[index - 1])
+                    enemy.loot[index - 1]['name'] = "Empty"
+                
+        elif index == 3:
+            if enemy.loot[index -1]['name'] is not "Empty":
+                if len(player.inventory['armors']) < 9:
+                    player.inventory['armors'].append(enemy.loot[index - 1])
+                    enemy.loot[index - 1]['name'] = "Empty"
+                
+        elif index == 4:
+            if enemy.loot[index -1]['name'] is not "Empty":
+                if len(player.inventory['spell-book']) < 9:
+                    player.inventory['spell-book'].append(enemy.loot[index - 1])
+                    enemy.loot[index - 1]['name'] = "Empty"
+                

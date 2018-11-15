@@ -81,14 +81,18 @@ def battle_update(key, state: Game) -> Game:
         enemy_decision(state.enemy, state.player, state)
 
     elif key == "3":
+        rest(state.player)
+        state.update_battle_log('player-rest')
+        enemy_decision(state.enemy, state.player, state)
+    elif key == "4":
         state.state = "weapon_menu"
-    elif key == '4':
-        state.state = 'armor_menu'
     elif key == '5':
+        state.state = 'armor_menu'
+    elif key == '6':
         state.state = 'spell_menu'
 
     if state.enemy.is_dead():
-        state.state = 'explore'
+        state.state = 'loot_menu'
     elif state.player.is_dead():
         state.state = 'game-over'
     return state
@@ -128,6 +132,22 @@ def game_over_update(key, state):
     return state
 
 
+def loot_update(key, state):
+    if key == '1':
+        loot(state.player, state.enemy, 1)
+    elif key == '2':
+        loot(state.player, state.enemy, 2)
+    elif key == "3":
+        loot(state.player, state.enemy, 3)
+    elif key == "4":
+        loot(state.player, state.enemy, 4)
+    elif key == "s":
+        state.state = "remove_inventory_menu"
+    elif key == "d":
+        state.state = "explore"
+    return state
+
+
 def update(key, state: Game) -> Game:
     if state.state == "explore":
         state = explore_update(key, state)
@@ -141,6 +161,8 @@ def update(key, state: Game) -> Game:
         state = spell_menu_update(key, state)
     elif state.state == 'game-over':
         state = game_over_update(key, state)
+    elif state.state == 'loot_menu':
+        state = loot_update(key, state)
 
     return state
 
@@ -230,6 +252,15 @@ def game_over_view(state, x, y):
     return string
 
 
+def loot_view(state, x, y):
+    string = "Choose what items you would like to take\n\n"
+    gold = f"[1] Gold: {state.enemy.loot[0]['value']}\n"
+    weapon = f"[2] Weapon: {state.enemy.loot[1]['name']}\n"
+    armor = f"[3] Armor: {state.enemy.loot[2]['name']}\n"
+
+    return string + gold + weapon + armor + inv
+
+
 def view(state, x, y):
     if state.state == "explore":
         string = explore_view(state, x, y)
@@ -243,6 +274,8 @@ def view(state, x, y):
         string = spell_menu_view(state, x, y)
     elif state.state == "game-over":
         string = game_over_view(state, x, y)
+    elif state.state == 'loot_menu':
+        string = loot_view(state, x, y)
     return string
 
 
