@@ -8,6 +8,33 @@ class Game:
         self.map_index = 0
         self.state = state
         self.enemy = None
+        self.battle_log: list = []
+
+    def fix_log_length(self):
+        if len(self.battle_log) > 6:
+            del self.battle_log[0]
+        return self
+
+    #adds the battle message to the battle log while keeping it a decent size
+    def update_battle_log(self, action):
+        enemy = self.enemy
+        enemy_attack_msg = '{} attacked you\n'.format(enemy.name)
+        player_attack_msg = 'You attacked {}'.format(enemy.name)
+        enemy_cast_msg = '{} casted {}\n'.format(enemy.name,
+                                                 enemy.spell['name'])
+        player_cast_msg = 'You casted {}'.format(self.player.spell['name'])
+
+        if action == 'enemy-attack':
+            self.battle_log.append(enemy_attack_msg)
+        elif action == 'player-attack':
+            self.battle_log.append(player_attack_msg)
+        elif action == 'enemy-cast':
+            self.battle_log.append(enemy_cast_msg)
+        elif action == 'player-cast':
+            self.battle_log.append(player_cast_msg)
+
+        self.fix_log_length()
+        return self
 
     def clear_player_spot(self) -> 'Game':
         self.player = self.player.clear_spot()
@@ -315,12 +342,14 @@ def load_spells():
     ice_chill = {'name': "Ice-Chill", 'cost': 10}
 
 
-def enemy_decision(enemy, player):
+def enemy_decision(enemy, player, state):
     num = randrange(0, 10)
     if enemy.magic > enemy.spell['cost'] and num < 5:
         cast_spell(enemy, player)
+        state.update_battle_log('enemy-cast')
     else:
         attack(enemy, player)
+        state.update_battle_log('enemy-attack')
 
 
 def cast_spell(player, enemy):
