@@ -8,6 +8,33 @@ class Game:
         self.map_index = 0
         self.state = state
         self.enemy = None
+        self.battle_log: list = []
+
+    def fix_log_length(self):
+        if len(self.battle_log) > 6:
+            del self.battle_log[0]
+        return self
+
+    #adds the battle message to the battle log while keeping it a decent size
+    def update_battle_log(self, action):
+        enemy = self.enemy
+        enemy_attack_msg = '{} attacked you\n'.format(enemy.name)
+        player_attack_msg = 'You attacked {}'.format(enemy.name)
+        enemy_cast_msg = '{} casted {}\n'.format(enemy.name,
+                                                 enemy.spell['name'])
+        player_cast_msg = 'You casted {}'.format(self.player.spell['name'])
+
+        if action == 'enemy-attack':
+            self.battle_log.append(enemy_attack_msg)
+        elif action == 'player-attack':
+            self.battle_log.append(player_attack_msg)
+        elif action == 'enemy-cast':
+            self.battle_log.append(enemy_cast_msg)
+        elif action == 'player-cast':
+            self.battle_log.append(player_cast_msg)
+
+        self.fix_log_length()
+        return self
 
     def clear_player_spot(self) -> 'Game':
         self.player = self.player.clear_spot()
@@ -20,21 +47,8 @@ class Game:
         self.player = self.player.new_spot()
         return self
 
-    def move_player_north(self) -> 'Game':
-        self.player = self.player.move_north()
-        return self
-
-    def move_player_south(self) -> 'Game':
-        self.player = self.player.move_south()
-        return self
-
-    def move_player_west(self) -> 'Game':
-        self.player = self.player.move_west()
-        return self
-
-    def move_player_east(self) -> 'Game':
-        self.player = self.player.move_east()
-        return self
+    def player_move_direction(self, direction):
+        return self.player.move_in_direction(direction)
 
     def player_check_for_enemy(self, enemies):
         return self.player.check_for_enemy(enemies)
@@ -129,6 +143,16 @@ class Player:
                 return enemy
             else:
                 return None
+
+    def move_in_direction(self, direction):
+        if direction == 'north':
+            self.move_north()
+        elif direction == 'south':
+            self.move_south()
+        elif direction == 'east':
+            self.move_east()
+        elif direction == 'west':
+            self.move_west()
 
     def move(self, x, y):
         self.location['x'] += x
@@ -315,12 +339,14 @@ def load_spells():
     ice_chill = {'name': "Ice-Chill", 'cost': 10}
 
 
-def enemy_decision(enemy, player):
+def enemy_decision(enemy, player, state):
     num = randrange(0, 10)
     if enemy.magic > enemy.spell['cost'] and num < 5:
         cast_spell(enemy, player)
+        state.update_battle_log('enemy-cast')
     else:
         attack(enemy, player)
+        state.update_battle_log('enemy-attack')
 
 
 def cast_spell(player, enemy):
