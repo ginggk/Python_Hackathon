@@ -12,7 +12,8 @@ def check_space_action(state, direction):
         state.state = 'explore'
         change_room(state, 'entrance')
         return state
-    #fix player movement
+    else:
+        state.player_move_direction(direction)
 
 
 def change_room(state, door_type):
@@ -38,11 +39,9 @@ def on_enemy_space_action(state):
 
 
 def explore_update(key, state: Game) -> Game:
-    #needs improvement when changing rooms
     if key == "KEY_UP":
         state.clear_player_spot()
         check_space_action(state, 'north')
-        state.move_player_north()
         state.player_new_spot()
         on_enemy_space_action(state)
 
@@ -50,21 +49,18 @@ def explore_update(key, state: Game) -> Game:
     elif key == "KEY_DOWN":
         state.clear_player_spot()
         check_space_action(state, 'south')
-        state.move_player_south()
         state.player_new_spot()
         on_enemy_space_action(state)
         return state
     elif key == "KEY_LEFT":
         state.clear_player_spot()
         check_space_action(state, 'west')
-        state.move_player_west()
         state.player_new_spot()
         on_enemy_space_action(state)
         return state
     elif key == "KEY_RIGHT":
         state.clear_player_spot()
         check_space_action(state, 'east')
-        state.move_player_east()
         on_enemy_space_action(state)
         state.player_new_spot()
 

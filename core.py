@@ -47,21 +47,8 @@ class Game:
         self.player = self.player.new_spot()
         return self
 
-    def move_player_north(self) -> 'Game':
-        self.player = self.player.move_north()
-        return self
-
-    def move_player_south(self) -> 'Game':
-        self.player = self.player.move_south()
-        return self
-
-    def move_player_west(self) -> 'Game':
-        self.player = self.player.move_west()
-        return self
-
-    def move_player_east(self) -> 'Game':
-        self.player = self.player.move_east()
-        return self
+    def player_move_direction(self, direction):
+        return self.player.move_in_direction(direction)
 
     def player_check_for_enemy(self, enemies):
         return self.player.check_for_enemy(enemies)
@@ -156,6 +143,16 @@ class Player:
                 return enemy
             else:
                 return None
+
+    def move_in_direction(self, direction):
+        if direction == 'north':
+            self.move_north()
+        elif direction == 'south':
+            self.move_south()
+        elif direction == 'east':
+            self.move_east()
+        elif direction == 'west':
+            self.move_west()
 
     def move(self, x, y):
         self.location['x'] += x
