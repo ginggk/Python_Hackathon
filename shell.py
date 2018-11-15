@@ -77,10 +77,12 @@ def explore_update(key, state: Game) -> Game:
 def battle_update(key, state: Game) -> Game:
     if key == "1":
         attack(state.player, state.enemy)
-        enemy_decision(state.enemy, state.player)
+        state.update_battle_log('player-attack')
+        enemy_decision(state.enemy, state.player, state)
     elif key == "2":
         cast_spell(state.player, state.enemy)
-        enemy_decision(state.enemy, state.player)
+        state.update_battle_log('player-cast')
+        enemy_decision(state.enemy, state.player, state)
 
     elif key == "3":
         state.state = "weapon_menu"
@@ -187,7 +189,11 @@ def battle_view(state, x, y):
     str_armor = '\n\tArmor: {:<13}{:<4}Armor: {:<13}'.format(
         player.armor['name'], space, enemy.armor['name'])
 
-    return string + str_names + str_health + str_magic + str_weapons + str_spell + str_armor
+    str_battle_log = '\n\n\tBattle Log\n'
+    for i in state.battle_log:
+        str_battle_log += i + '\n'
+
+    return string + str_names + str_health + str_magic + str_weapons + str_spell + str_armor + str_battle_log
 
 
 def weapon_menu_view(state, x, y):
