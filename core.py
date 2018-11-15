@@ -5,7 +5,6 @@ class Game:
     def __init__(self, player: 'Player', _map, state) -> None:
         self.player: Player = player
         self._map = _map
-        self.map_index = 0
         self.state = state
         self.enemy = None
 
@@ -40,12 +39,6 @@ class Game:
         return self.player.check_for_enemy(enemies)
 
 
-class Item:
-    def __init__(self, name, classify):
-        self.name = name
-        self.classify = classify
-
-
 class Player:
     def __init__(self, health: int, name: str, magic, location, room) -> None:
         self.health = health
@@ -53,37 +46,20 @@ class Player:
         self.magic = magic
         self.base_attack = 5
         self.weapon = "None"
-        self.spell = {'name': 'Firepuff', 'cost': 10}
+        self.spell = "Firepuff"
         self.armor = "none"
         self.location = location
         self.room = room
         self.inventory = {
-            'gold':
-            0,
+            'gold': 0,
             'weapons': [],
             'armors': [],
-            'spell-book': [
-                {
-                    'name': 'Firepuff',
-                    'cost': 10
-                },
-                {
-                    'name': "Ice-Chill",
-                    'cost': 10
-                },
-            ],
+            'spell-book': [],
             'items': {
                 'keys': [],
                 'potions': []
             }
         }
-
-    def is_dead(self):
-        if self.health <= 0:
-            self.health = 0
-            return True
-        else:
-            return False
 
     def clear_spot(self):
         self.room.build[self.location['y']][self.location['x']] = 0
@@ -102,25 +78,17 @@ class Player:
         place = self.room.build
 
         if direction == "north":
-            if place[y - 1][x] == 3:
-                return "exit"
-            elif place[y - 1][x] == 5:
-                return "entrance"
+            if place[y - 1][x] == 4:
+                return "enemy"
         elif direction == "south":
-            if place[y + 1][x] == 3:
-                return 'exit'
-            elif place[y + 1][x] == 5:
-                return "entrance"
+            if place[y + 1][x] == 4:
+                return 'enemy'
         elif direction == "east":
-            if place[y][x + 1] == 3:
-                return 'exit'
-            elif place[y][x + 1] == 5:
-                return "entrance"
+            if place[y][x + 1] == 4:
+                return 'enemy'
         elif direction == "west":
-            if place[y][x - 1] == 3:
-                return 'exit'
-            elif place[y][x - 1] == 5:
-                return "entrance"
+            if place[y][x - 1] == 4:
+                return 'enemy'
 
     def check_for_enemy(self, enemies):
         for enemy in enemies:
@@ -186,12 +154,10 @@ class Player:
 
 
 class Enemy:
-    def __init__(self, name, health, magic, base_attack, weapon, spell, armor,
-                 location):
+    def __init__(self, name, health, magic, weapon, spell, armor, location):
         self.name = name
         self.health = health
         self.magic = magic
-        self.base_attack = base_attack
         self.weapon = weapon
         self.spell = spell
         self.armor = armor
@@ -207,73 +173,10 @@ class Enemy:
 
 
 class Room:
-    def __init__(self, player_start, through_exit, enemies, build):
-        self.player_start = player_start  #determines where the player when the room is displayed
-        self.through_exit = through_exit  #determines where the player is if they go come back through the exit door
+    def __init__(self, items, enemies, build):
+        self.items = items
         self.enemies = enemies
         self.build = build
-
-
-def load_map():
-
-    room_1 = build_room_1()
-    room_2 = build_room_2()
-    _map = [room_1, room_2]
-    return _map
-
-
-[
-    1,
-    2,
-    3,
-]
-
-
-def build_room_1():
-    start = {'x': 2, 'y': 1}
-
-    _exit = {'x': 2, 'y': 4}
-
-    enemies = [
-        Enemy("Ginger", 100, 100, 5, get_weapon('none'), {
-            'name': 'Firepuff',
-            'cost': 10
-        }, get_armor('none'), {
-            'x': 2,
-            'y': 4
-        })
-    ]
-
-    build = [
-        [2, 2, 2, 2],
-        [2, 0, 1, 2],
-        [2, 0, 2, 2],
-        [2, 0, 2, 2],
-        [2, 0, 4, 3],
-        [2, 2, 2, 2],
-    ]
-
-    room = Room(start, _exit, enemies, build)
-    return room
-
-
-def build_room_2():
-    start = {'x': 1, 'y': 2}
-
-    _exit = {'x': 0, 'y': 0}
-
-    enemies = []
-
-    build = [
-        [2, 2, 2, 2, 2, 2],
-        [2, 2, 0, 0, 0, 2],
-        [5, 0, 0, 0, 0, 2],
-        [2, 2, 0, 0, 4, 2],
-        [2, 2, 2, 2, 3, 2],
-    ]
-
-    room = Room(start, _exit, enemies, build)
-    return room
 
 
 def load_armor():
@@ -304,46 +207,55 @@ def get_weapon(name):
             return weapon
 
 
+def load_map():
+    room_1 = Room([], [
+        Enemy("Ginger", 100, 100, get_weapon('none'), "None",
+              get_armor('none'), {
+                  'x': 2,
+                  'y': 4
+              })
+    ], [[2, 2, 2, 2], [2, 0, 1, 2], [2, 0, 2, 2], [2, 0, 2, 2], [2, 0, 4, 3],
+        [2, 2, 2, 2]])
+    _map = [room_1]
+    return _map
+
+
 def attack(player, enemy):
     attack = (player.base_attack * player.weapon['multiplier'])
     enemy.health -= (attack - enemy.armor['defense'])
     return player
 
 
-def load_spells():
-    firepuff = {'name': 'Firepuff', 'cost': 10}
-    ice_chill = {'name': "Ice-Chill", 'cost': 10}
-
-
-def enemy_decision(enemy, player):
-    num = randrange(0, 10)
-    if enemy.magic > enemy.spell['cost'] and num < 5:
-        cast_spell(enemy, player)
-    else:
-        attack(enemy, player)
-
-
 def cast_spell(player, enemy):
-    if player.spell[
-            'name'] == 'Firepuff' and player.magic >= player.spell['cost']:
+    if player.spell == 'Firepuff':
         enemy.health -= randrange(5, 10)
-        player.magic -= player.spell['cost']
-    elif player.spell[
-            'name'] == "Ice-Chill" and player.magic >= player.spell['cost']:
-        enemy.health -= 8
-        player.magic -= player.spell['cost']
+        player.magic -= 10
+    return player
 
 
 def equip_weapon(player, index):
     if index <= len(player.inventory['weapons']):
         player.weapon = player.inventory['weapons'][index - 1]
+    return player
 
 
 def equip_armor(player, index):
     if index <= len(player.inventory['armors']):
         player.armor = player.inventory['armors'][index - 1]
+    return player
 
 
-def equip_spell(player, index):
-    if index <= len(player.inventory['spell-book']):
-        player.spell = player.inventory['spell-book'][index - 1]
+def draw_room(room):
+    string = ''
+    for i in room:
+        if i == 0:
+            string += " "
+        elif i == 1:
+            string += "P"
+        elif i == 2:
+            string += "[]"
+        elif i == 3:
+            string += "E"
+        elif i == 4:
+            string += "X"
+    return string
