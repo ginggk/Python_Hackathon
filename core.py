@@ -78,6 +78,13 @@ class Player:
             }
         }
 
+    def is_dead(self):
+        if self.health <= 0:
+            self.health = 0
+            return True
+        else:
+            return False
+
     def clear_spot(self):
         self.room.build[self.location['y']][self.location['x']] = 0
         return self
