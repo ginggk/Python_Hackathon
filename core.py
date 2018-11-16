@@ -265,15 +265,9 @@ def load_map():
     room_1 = build_room_1()
     room_2 = build_room_2()
     room_3 = build_room_3()
-    _map = [room_1, room_2, room_3]
+    room_4 = build_room_4()
+    _map = [room_1, room_2, room_3, room_4]
     return _map
-
-
-[
-    1,
-    2,
-    3,
-]
 
 
 def build_room_1():
@@ -314,7 +308,7 @@ def build_room_1():
 def build_room_2():
     start = {'x': 1, 'y': 2}
 
-    _exit = {'x': 4, 'y': 4}
+    _exit = {'x': 4, 'y': 3}
 
     enemy_weapon = get_weapon('Broken Dagger')
     enemy_armor = get_armor("Leather")
@@ -341,9 +335,9 @@ def build_room_2():
     return room
 
 def build_room_3():
-    start = {'x': 1, 'y': 0}
+    start = {'x': 1, 'y': 1}
 
-    _exit = {'x': 7, 'y': 1}
+    _exit = {'x': 6, 'y': 1}
 
     enemy_1_weapon = get_weapon('Broken Dagger')
     enemy_1_armor = get_armor("Leather")
@@ -381,6 +375,69 @@ def build_room_3():
         [2, 0, 2, 2, 2, 2, 0, 2],
         [2, 4, 0, 0, 0, 0, 0, 2],
         [2, 2, 2, 2, 2, 2, 2, 2],
+
+    ]
+
+    room = Room(start, _exit, enemies, build)
+    return room
+
+def build_room_4():
+    start = {'x': 1, 'y': 3}
+
+    _exit = {'x': 5, 'y': 6}
+
+    enemy_1_weapon = get_weapon('Broken Dagger')
+    enemy_1_armor = get_armor("Leather")
+    enemy_1_spell = {
+            'name': 'Firepuff',
+            'cost': 10
+        }
+
+    enemy_2_weapon = get_weapon('Broken Dagger')
+    enemy_2_armor = get_armor("Leather")
+    enemy_2_spell = {
+            'name': 'Firepuff',
+            'cost': 10
+        }
+
+    enemy_3_weapon = get_weapon('Broken Dagger')
+    enemy_3_armor = get_armor("Leather")
+    enemy_3_spell = {
+            'name': 'Firepuff',
+            'cost': 10
+        }
+
+    
+
+    enemies = [ 
+        Enemy("Dale", 100, 100, 10, 3, enemy_1_weapon, enemy_1_spell, enemy_1_armor, {
+            'x': 2,
+            'y': 1
+        }, [{'name': 'Gold', 'value': 10}, {'name': enemy_1_weapon['name'], 'value': enemy_1_weapon},
+            {'name': enemy_1_armor['name'], 'value': enemy_1_armor}, {'name': enemy_1_spell['name'], 'value': enemy_1_spell}]),
+
+        Enemy("Bill", 100, 100, 10, 3, enemy_2_weapon, enemy_2_spell, enemy_2_armor, {
+            'x': 2,
+            'y': 6
+        }, [{'name': 'Gold', 'value': 10}, {'name': enemy_2_weapon['name'], 'value': enemy_2_weapon},
+            {'name': enemy_2_armor['name'], 'value': enemy_2_armor}, {'name': enemy_2_spell['name'], 'value': enemy_2_spell}]),
+
+        Enemy("Boomhauer", 100, 100, 10, 3, enemy_2_weapon, enemy_2_spell, enemy_2_armor, {
+            'x': 3,
+            'y': 3
+        }, [{'name': 'Gold', 'value': 10}, {'name': enemy_3_weapon['name'], 'value': enemy_3_weapon},
+            {'name': enemy_3_armor['name'], 'value': enemy_3_armor}, {'name': enemy_3_spell['name'], 'value': enemy_3_spell}])
+            ]
+
+    build = [
+        [2, 2, 2, 2, 2, 2, 2],
+        [2, 0, 4, 0, 2, 0, 2],
+        [2, 0, 2, 0, 2, 0, 2],
+        [5, 0, 2, 4, 0, 0, 2],
+        [2, 0, 2, 0, 2, 0, 2],
+        [2, 0, 2, 0, 2, 0, 2],
+        [2, 0, 4, 0, 2, 0, 3],
+        [2, 2, 2, 2, 2, 2, 2],
 
     ]
 
