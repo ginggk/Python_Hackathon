@@ -2,13 +2,17 @@ from random import randrange
 
 
 class Game:
-    def __init__(self, player: 'Player', _map, state) -> None:
+    def __init__(self, player: 'Player', _map, state, map_index) -> None:
         self.player: Player = player
         self._map = _map
-        self.map_index = 0
+        self.map_index = map_index
         self.state = state
         self.enemy = None
         self.battle_log: list = []
+
+    def __repr__(self):
+        return f'Game({self.player}, {self._map}, {self.state}, {self.map_index})'
+
 
     def fix_log_length(self):
         if len(self.battle_log) > 6:
@@ -59,6 +63,11 @@ class Game:
     def player_check_for_enemy(self, enemies):
         return self.player.check_for_enemy(enemies)
 
+    def restore_player(self):
+        self.player.health = self.player.max_health
+        self.player.magic = self.player.max_magic
+        return self
+
 
 class Player:
     def __init__(self, health: int, name: str, magic, location, room) -> None:
@@ -94,6 +103,7 @@ class Player:
                 'potions': []
             }
         }
+
 
     def is_dead(self):
         if self.health <= 0:
@@ -144,8 +154,7 @@ class Player:
             if self.location['x'] == enemy.location['x'] and self.location[
                     'y'] == enemy.location['y'] and enemy.is_dead() == False:
                 return enemy
-            else:
-                return None
+
 
     def move_in_direction(self, direction):
         if direction == 'north':
@@ -255,7 +264,8 @@ def load_map():
 
     room_1 = build_room_1()
     room_2 = build_room_2()
-    _map = [room_1, room_2]
+    room_3 = build_room_3()
+    _map = [room_1, room_2, room_3]
     return _map
 
 
@@ -304,9 +314,20 @@ def build_room_1():
 def build_room_2():
     start = {'x': 1, 'y': 2}
 
-    _exit = {'x': 0, 'y': 0}
+    _exit = {'x': 4, 'y': 4}
 
-    enemies = []
+    enemy_weapon = get_weapon('Broken Dagger')
+    enemy_armor = get_armor("Leather")
+    enemy_spell = {
+            'name': 'Firepuff',
+            'cost': 10
+        }
+
+    enemies = [ Enemy("Bobby Hill", 100, 100, 10, 3, enemy_weapon, enemy_spell, enemy_armor, {
+            'x': 4,
+            'y': 3
+        }, [{'name': 'Gold', 'value': 10}, {'name': enemy_weapon['name'], 'value': enemy_weapon},
+            {'name': enemy_armor['name'], 'value': enemy_armor}, {'name': enemy_spell['name'], 'value': enemy_spell}])]
 
     build = [
         [2, 2, 2, 2, 2, 2],
@@ -314,6 +335,53 @@ def build_room_2():
         [5, 0, 0, 0, 0, 2],
         [2, 2, 0, 0, 4, 2],
         [2, 2, 2, 2, 3, 2],
+    ]
+
+    room = Room(start, _exit, enemies, build)
+    return room
+
+def build_room_3():
+    start = {'x': 1, 'y': 0}
+
+    _exit = {'x': 7, 'y': 1}
+
+    enemy_1_weapon = get_weapon('Broken Dagger')
+    enemy_1_armor = get_armor("Leather")
+    enemy_1_spell = {
+            'name': 'Firepuff',
+            'cost': 10
+        }
+
+    enemy_2_weapon = get_weapon('Broken Dagger')
+    enemy_2_armor = get_armor("Leather")
+    enemy_2_spell = {
+            'name': 'Firepuff',
+            'cost': 10
+        }
+
+    
+
+    enemies = [ Enemy("Lady Bird", 100, 100, 10, 3, enemy_1_weapon, enemy_1_spell, enemy_1_armor, {
+            'x': 3,
+            'y': 2
+        }, [{'name': 'Gold', 'value': 10}, {'name': enemy_1_weapon['name'], 'value': enemy_1_weapon},
+            {'name': enemy_1_armor['name'], 'value': enemy_1_armor}, {'name': enemy_1_spell['name'], 'value': enemy_1_spell}]),
+            Enemy("Peggy Hill", 100, 100, 10, 3, enemy_2_weapon, enemy_2_spell, enemy_2_armor, {
+            'x': 1,
+            'y': 5
+        }, [{'name': 'Gold', 'value': 10}, {'name': enemy_2_weapon['name'], 'value': enemy_2_weapon},
+            {'name': enemy_2_armor['name'], 'value': enemy_2_armor}, {'name': enemy_2_spell['name'], 'value': enemy_2_spell}])
+            ]
+
+    build = [
+        [2, 5, 2, 2, 2, 2, 2, 2],
+        [2, 0, 0, 0, 2, 2, 0, 3],
+        [2, 0, 2, 4, 2, 2, 0, 2],
+        [2, 0, 2, 0, 0, 0, 0, 2],
+        [2, 0, 2, 2, 2, 2, 0, 2],
+        [2, 4, 0, 0, 0, 0, 0, 2],
+        [2, 2, 2, 2, 2, 2, 2, 2],
+
     ]
 
     room = Room(start, _exit, enemies, build)
@@ -369,7 +437,7 @@ def load_spells():
 
 def enemy_decision(enemy, player, state):
     num = randrange(0, 10)
-    if enemy.magic > enemy.spell['cost'] and num < 5:
+    if enemy.magic >= enemy.spell['cost'] and num < 5:
         cast_spell(enemy, player)
         state.update_battle_log('enemy-cast')
     elif enemy.magic < enemy.spell['cost'] and num > 5:
