@@ -282,7 +282,10 @@ def build_room_1():
             'x': 2,
             'y': 4
         }, [{'name': 'Gold', 'value': 10}, {'name': enemy_weapon['name'], 'value': enemy_weapon},
-            {'name': enemy_armor['name'], 'value': enemy_armor}])
+            {'name': enemy_armor['name'], 'value': enemy_armor}, {'name': 'Firepuff', 'value': {
+            'name': 'Firepuff',
+            'cost': 10
+        }}])
     ]
 
     build = [
@@ -392,6 +395,10 @@ def equip_weapon(player, index):
     if index <= len(player.inventory['weapons']):
         player.weapon = player.inventory['weapons'][index - 1]
 
+def remove_item(player, index, category):
+    if index <=len(player.inventory[category]) - 1 and index is not 0:
+        del player.inventory[category][index ]
+
 
 def equip_armor(player, index):
     if index <= len(player.inventory['armors']):
@@ -413,18 +420,18 @@ def loot(player, enemy, index):
         elif index == 2:
             if enemy.loot[index -1]['name'] is not "Empty":
                 if len(player.inventory['weapons']) < 9:
-                    player.inventory['weapons'].append(enemy.loot[index - 1])
+                    player.inventory['weapons'].append(enemy.loot[index - 1]['value'])
                     enemy.loot[index - 1]['name'] = "Empty"
                 
         elif index == 3:
             if enemy.loot[index -1]['name'] is not "Empty":
                 if len(player.inventory['armors']) < 9:
-                    player.inventory['armors'].append(enemy.loot[index - 1])
+                    player.inventory['armors'].append(enemy.loot[index - 1]['value'])
                     enemy.loot[index - 1]['name'] = "Empty"
                 
         elif index == 4:
             if enemy.loot[index -1]['name'] is not "Empty":
                 if len(player.inventory['spell-book']) < 9:
-                    player.inventory['spell-book'].append(enemy.loot[index - 1])
+                    player.inventory['spell-book'].append(enemy.loot[index - 1]['value'])
                     enemy.loot[index - 1]['name'] = "Empty"
                 

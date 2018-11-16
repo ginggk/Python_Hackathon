@@ -108,6 +108,109 @@ def weapon_menu_update(key, state):
     return state
 
 
+def remove_inventory_update(key, state):
+    if key == 'w':
+        state.state = 'remove_weapon'
+    elif key == 'a':
+        state.state = 'remove_armor'
+    elif key == 's':
+        state.state = 'remove_spell'
+    return state
+
+
+def remove_weapon_update(key, state):
+    if key == '1':
+        remove_item(state.player, 1, 'weapons')
+        state.state = "loot_menu"
+    elif key == '2':
+        remove_item(state.player, 2, 'weapons')
+        state.state = "loot_menu"
+    elif key == '3':
+        remove_item(state.player, 3, 'weapons')
+        state.state = "loot_menu"
+    elif key == '4':
+        remove_item(state.player, 4, 'weapons')
+        state.state = "loot_menu"
+    elif key == '5':
+        remove_item(state.player, 5, 'weapons')
+        state.state = "loot_menu"
+    elif key == '6':
+        remove_item(state.player, 6, 'weapons')
+        state.state = "loot_menu"
+    elif key == '7':
+        remove_item(state.player, 7, 'weapons')
+        state.state = "loot_menu"
+    elif key == '8':
+        remove_item(state.player, 8, 'weapons')
+        state.state = "loot_menu"
+    elif key == '9':
+        remove_item(state.player, 9, 'weapons')
+        state.state = "loot_menu"
+    return state
+
+
+def remove_armor_update(key, state):
+    if key == '1':
+        remove_item(state.player, 1, 'armors')
+        state.state = "loot_menu"
+    elif key == '2':
+        remove_item(state.player, 2, 'armors')
+        state.state = "loot_menu"
+    elif key == '3':
+        remove_item(state.player, 3, 'armors')
+        state.state = "loot_menu"
+    elif key == '4':
+        remove_item(state.player, 4, 'armors')
+        state.state = "loot_menu"
+    elif key == '5':
+        remove_item(state.player, 5, 'armors')
+        state.state = "loot_menu"
+    elif key == '6':
+        remove_item(state.player, 6, 'armors')
+        state.state = "loot_menu"
+    elif key == '7':
+        remove_item(state.player, 7, 'armors')
+        state.state = "loot_menu"
+    elif key == '8':
+        remove_item(state.player, 8, 'armors')
+        state.state = "loot_menu"
+    elif key == '9':
+        remove_item(state.player, 9, 'armors')
+        state.state = "loot_menu"
+    return state
+
+
+def remove_spell_update(key, state):
+    if key == '1':
+        remove_item(state.player, 1, 'spell-book')
+        state.state = "loot_menu"
+    elif key == '2':
+        remove_item(state.player, 2, 'spell-book')
+        state.state = "loot_menu"
+    elif key == '3':
+        remove_item(state.player, 3, 'spell-book')
+        state.state = "loot_menu"
+    elif key == '4':
+        remove_item(state.player, 4, 'spell-book')
+        state.state = "loot_menu"
+    elif key == '5':
+        remove_item(state.player, 5, 'spell-book')
+        state.state = "loot_menu"
+    elif key == '6':
+        remove_item(state.player, 6, 'spell-book')
+        state.state = "loot_menu"
+    elif key == '7':
+        remove_item(state.player, 7, 'spell-book')
+        state.state = "loot_menu"
+    elif key == '8':
+        remove_item(state.player, 8, 'spell-book')
+        state.state = "loot_menu"
+    elif key == '9':
+        remove_item(state.player, 9, 'spell-book')
+        state.state = "loot_menu"
+    return state
+
+
 def armor_menu_update(key, state):
     if key == '1':
         equip_armor(state.player, 1)
@@ -163,6 +266,14 @@ def update(key, state: Game) -> Game:
         state = game_over_update(key, state)
     elif state.state == 'loot_menu':
         state = loot_update(key, state)
+    elif state.state == 'remove_inventory_menu':
+        state = remove_inventory_update(key, state)
+    elif state.state == 'remove_weapon':
+        state = remove_weapon_update(key, state)
+    elif state.state == 'remove_armor':
+        state = remove_armor_update(key, state)
+    elif state.state == 'remove_spell':
+        state = remove_spell_update(key, state)
 
     return state
 
@@ -225,6 +336,44 @@ def weapon_menu_view(state, x, y):
     return string
 
 
+def weapon_remove_view(state, x, y):
+    string = "Choose a weapon to remove\n"
+    counter = 1
+
+    for weapon in state.player.inventory['weapons'][1:]:
+        new_str = f'{counter}: {weapon["name"]}\n'
+        counter += 1
+        string += new_str
+    return string
+
+
+def armor_remove_view(state, x, y):
+    string = "Choose an Armor to remove\n"
+    counter = 1
+
+    for armor in state.player.inventory['armors'][1:]:
+        new_str = f'{counter}: {armor["name"]}\n'
+        counter += 1
+        string += new_str
+    return string
+
+
+def spell_remove_view(state, x, y):
+    string = "Choose a Spell to remove\n"
+    counter = 1
+
+    for spell in state.player.inventory['spell-book'][1:]:
+        new_str = f'{counter}: {spell["name"]}\n'
+        counter += 1
+        string += new_str
+    return string
+
+
+def remove_inventory_view(state, x, y):
+    string = "Choose A Category to Edit\n[W] Weapons\t [A] Armor\t [S] Spell-Book"
+    return string
+
+
 def armor_menu_view(state, x, y):
     string = 'Choose Your Current Armor\n'
     counter = 1
@@ -257,8 +406,13 @@ def loot_view(state, x, y):
     gold = f"[1] Gold: {state.enemy.loot[0]['value']}\n"
     weapon = f"[2] Weapon: {state.enemy.loot[1]['name']}\n"
     armor = f"[3] Armor: {state.enemy.loot[2]['name']}\n"
+    spells = f"[4] Spell: {state.enemy.loot[3]['name']}"
 
-    return string + gold + weapon + armor + inv
+    inv = f"\n\n\n{state.player.inventory['armors']}"
+
+    controls = "\n\n\n[D] Done\n[S] Edit Inventory"
+
+    return string + gold + weapon + armor + spells + inv
 
 
 def view(state, x, y):
@@ -276,6 +430,14 @@ def view(state, x, y):
         string = game_over_view(state, x, y)
     elif state.state == 'loot_menu':
         string = loot_view(state, x, y)
+    elif state.state == "remove_inventory_menu":
+        string = remove_inventory_view(state, x, y)
+    elif state.state == 'remove_weapon':
+        string = weapon_remove_view(state, x, y)
+    elif state.state == 'remove_armor':
+        string = armor_remove_view(state, x, y)
+    elif state.state == 'remove_spell':
+        string = spell_remove_view(state, x, y)
     return string
 
 
