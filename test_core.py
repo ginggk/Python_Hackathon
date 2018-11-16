@@ -144,3 +144,6 @@ def test_equip_armor():
     })
     index = 1
     assert equip_armor(player, index) == player
+
+
+# def test_load_map():
