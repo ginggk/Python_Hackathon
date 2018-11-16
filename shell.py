@@ -6,9 +6,14 @@ import emoji
 
 def check_space_action(state, direction):
     if state.player_check_space(direction) == 'exit':
-        state.state = 'explore'
-        change_room(state, 'exit')
+        if state.map_index is not 4:
+            state.state = 'explore'
+            change_room(state, 'exit')
+        else:
+            state.state = 'complete'
+
         return state
+
     elif state.player_check_space(direction) == 'entrance':
         state.state = 'explore'
         change_room(state, 'entrance')
@@ -94,6 +99,8 @@ def battle_update(key, state: Game) -> Game:
 
     if state.enemy.is_dead():
         state.state = 'loot_menu'
+        state.restore_player()
+        state.battle_log = []
 
     elif state.player.is_dead():
         state.state = 'game-over'
@@ -106,6 +113,27 @@ def weapon_menu_update(key, state):
         state.state = "battle"
     elif key == "2":
         equip_weapon(state.player, 2)
+        state.state = "battle"
+    elif key == "3":
+        equip_weapon(state.player, 3)
+        state.state = "battle"
+    elif key == "4":
+        equip_weapon(state.player, 4)
+        state.state = "battle"
+    elif key == "5":
+        equip_weapon(state.player, 5)
+        state.state = "battle"
+    elif key == "6":
+        equip_weapon(state.player, 6)
+        state.state = "battle"
+    elif key == "7":
+        equip_weapon(state.player, 7)
+        state.state = "battle"
+    elif key == "8":
+        equip_weapon(state.player, 8)
+        state.state = "battle"
+    elif key == "9":
+        equip_weapon(state.player, 9)
         state.state = "battle"
     return state
 
@@ -207,22 +235,64 @@ def remove_spell_update(key, state):
 
 
 def armor_menu_update(key, state):
-    if key == '1':
+    if key == "1":
         equip_armor(state.player, 1)
         state.state = "battle"
-    elif key == '2':
+    elif key == "2":
         equip_armor(state.player, 2)
-        state.state = 'battle'
+        state.state = "battle"
+    elif key == "3":
+        equip_armor(state.player, 3)
+        state.state = "battle"
+    elif key == "4":
+        equip_armor(state.player, 4)
+        state.state = "battle"
+    elif key == "5":
+        equip_armor(state.player, 5)
+        state.state = "battle"
+    elif key == "6":
+        equip_armor(state.player, 6)
+        state.state = "battle"
+    elif key == "7":
+        equip_armor(state.player, 7)
+        state.state = "battle"
+    elif key == "8":
+        equip_armor(state.player, 8)
+        state.state = "battle"
+    elif key == "9":
+        equip_armor(state.player, 9)
+        state.state = "battle"
     return state
 
 
 def spell_menu_update(key, state):
-    if key == '1':
+    if key == "1":
         equip_spell(state.player, 1)
-        state.state = 'battle'
+        state.state = "battle"
     elif key == "2":
         equip_spell(state.player, 2)
-        state.state = 'battle'
+        state.state = "battle"
+    elif key == "3":
+        equip_spell(state.player, 3)
+        state.state = "battle"
+    elif key == "4":
+        equip_spell(state.player, 4)
+        state.state = "battle"
+    elif key == "5":
+        equip_spell(state.player, 5)
+        state.state = "battle"
+    elif key == "6":
+        equip_spell(state.player, 6)
+        state.state = "battle"
+    elif key == "7":
+        equip_spell(state.player, 7)
+        state.state = "battle"
+    elif key == "8":
+        equip_spell(state.player, 8)
+        state.state = "battle"
+    elif key == "9":
+        equip_spell(state.player, 9)
+        state.state = "battle"
     return state
 
 
@@ -239,11 +309,16 @@ def loot_update(key, state):
         loot(state.player, state.enemy, 3)
     elif key == "4":
         loot(state.player, state.enemy, 4)
-    elif key == "s":
+    elif key == "i":
         state.state = "remove_inventory_menu"
     elif key == "d":
         state.state = "explore"
     return state
+
+
+def complete_update(key, state):
+    if key == 'q':
+        exit()
 
 
 def update(key, state: Game) -> Game:
@@ -269,6 +344,8 @@ def update(key, state: Game) -> Game:
         state = remove_armor_update(key, state)
     elif state.state == 'remove_spell':
         state = remove_spell_update(key, state)
+    elif state.state == 'complete':
+        state = complete_update(key, state)
 
     return state
 
@@ -280,9 +357,9 @@ def explore_view(state, x, y):
             if cell == 0:
                 string += "  "
             elif cell == 1:
-                string += emoji.emojize(":full_moon:")
+                string += emoji.emojize(":radio_button:")
             elif cell == 2:
-                string += emoji.emojize(":musical_keyboard:")
+                string += emoji.emojize(":white_large_square:")
             elif cell == 3:
                 string += emoji.emojize(":door:")
             elif cell == 4:
@@ -313,11 +390,13 @@ def battle_view(state, x, y):
     str_armor = '\n\tArmor: {:<13}{:<4}Armor: {:<13}'.format(
         player.armor['name'], space, enemy.armor['name'])
 
+    str_controls = "\n\n\t[1] Attack  [2] Cast Spell  [3] Rest  [4] Change Weapon   [5] Change Armor  [6] Change Spell"
+
     str_battle_log = '\n\n\tBattle Log\n'
     for i in state.battle_log:
         str_battle_log += i + '\n'
 
-    return string + str_names + str_health + str_magic + str_weapons + str_spell + str_armor + str_battle_log
+    return string + str_names + str_health + str_magic + str_weapons + str_spell + str_armor + str_battle_log + str_controls
 
 
 def weapon_menu_view(state, x, y):
@@ -406,9 +485,15 @@ def loot_view(state, x, y):
 
     inv = f"\n\n\n{state.player.inventory['armors']}"
 
-    controls = "\n\n\n[D] Done\t[S] Edit Inventory"
+    controls = "\n\n\n[D] Done\t[I] Edit Inventory"
 
     return string + gold + weapon + armor + spells + controls
+
+
+def complete_view(state, x, y):
+    string = "Congrats, you completed the first level\n"
+    controls = "[Q] Quit"
+    return string + controls
 
 
 def view(state, x, y):
@@ -434,32 +519,44 @@ def view(state, x, y):
         string = armor_remove_view(state, x, y)
     elif state.state == 'remove_spell':
         string = spell_remove_view(state, x, y)
+    elif state.state == 'complete':
+        string = complete_view(state, x, y)
     return string
 
 
 def player_name():
 
-    name = input("What is your name: ")
-    if len(name) == 0:
-        player_name()
-
-    else:
-        return name
+    while True:
+        name = input("What is your name: ")
+        if len(name) > 0 and name is not None and len(name) < 7:
+            return name
 
 
 def main():
     os.system('clear')
     _map = load_map()
     name = player_name()
-    player = Player(100.00, name, 100, {'x': 2, 'y': 1}, _map[0])
-    player.weapon = get_weapon('none')
-    player.inventory['weapons'].append(get_weapon('none'))
-    player.inventory['weapons'].append(get_weapon('Broken Dagger'))
-    player.armor = get_armor('Leather')
-    player.inventory['armors'].append(get_armor('none'))
-    player.inventory['armors'].append(get_armor('Leather'))
+    if name == 'cheat':
+        player = Player(100.00, name, 100, {'x': 2, 'y': 1}, _map[0])
+        player.base_attack = 1000
+        player.weapon = get_weapon('none')
+        player.inventory['weapons'].append(get_weapon('none'))
+        player.inventory['weapons'].append(get_weapon('Broken Dagger'))
+        player.armor = get_armor('Leather')
+        player.inventory['armors'].append(get_armor('none'))
+        player.inventory['armors']
 
-    run(Game(player, _map, "explore", 0), update, view)
+        run(Game(player, _map, "explore", 0), update, view)
+    else:
+        player = Player(100.00, name, 100, {'x': 2, 'y': 1}, _map[0])
+        player.weapon = get_weapon('none')
+        player.inventory['weapons'].append(get_weapon('none'))
+        player.inventory['weapons'].append(get_weapon('Broken Dagger'))
+        player.armor = get_armor('Leather')
+        player.inventory['armors'].append(get_armor('none'))
+        player.inventory['armors'].append(get_armor('Leather'))
+
+        run(Game(player, _map, "explore", 0), update, view)
 
 
 if __name__ == "__main__":

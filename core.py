@@ -93,10 +93,6 @@ class Player:
                     'name': 'Firepuff',
                     'cost': 10
                 },
-                {
-                    'name': "Ice-Chill",
-                    'cost': 10
-                },
             ],
             'items': {
                 'keys': [],
@@ -260,14 +256,7 @@ class Item:
         self.classify = classify
 
 
-def load_map():
 
-    room_1 = build_room_1()
-    room_2 = build_room_2()
-    room_3 = build_room_3()
-    room_4 = build_room_4()
-    _map = [room_1, room_2, room_3, room_4]
-    return _map
 
 
 def build_room_1():
@@ -339,15 +328,15 @@ def build_room_3():
 
     _exit = {'x': 6, 'y': 1}
 
-    enemy_1_weapon = get_weapon('Broken Dagger')
+    enemy_1_weapon = get_weapon('Small Knife')
     enemy_1_armor = get_armor("Leather")
     enemy_1_spell = {
             'name': 'Firepuff',
             'cost': 10
         }
 
-    enemy_2_weapon = get_weapon('Broken Dagger')
-    enemy_2_armor = get_armor("Leather")
+    enemy_2_weapon = get_weapon('Small Knife')
+    enemy_2_armor = get_armor("Leather Lv.2")
     enemy_2_spell = {
             'name': 'Firepuff',
             'cost': 10
@@ -387,26 +376,22 @@ def build_room_4():
     _exit = {'x': 5, 'y': 6}
 
     enemy_1_weapon = get_weapon('Broken Dagger')
-    enemy_1_armor = get_armor("Leather")
+    enemy_1_armor = get_armor("Leather Lv.3")
     enemy_1_spell = {
             'name': 'Firepuff',
             'cost': 10
         }
 
-    enemy_2_weapon = get_weapon('Broken Dagger')
-    enemy_2_armor = get_armor("Leather")
+    enemy_2_weapon = get_weapon('Knuckles')
+    enemy_2_armor = get_armor("Leather Lv.3")
     enemy_2_spell = {
             'name': 'Firepuff',
             'cost': 10
         }
 
-    enemy_3_weapon = get_weapon('Broken Dagger')
-    enemy_3_armor = get_armor("Leather")
-    enemy_3_spell = {
-            'name': 'Firepuff',
-            'cost': 10
-        }
-
+    enemy_3_weapon = get_weapon('Dagger')
+    enemy_3_armor = get_armor("Leather Lv.3")
+    enemy_3_spell = {'name': "Ice-Chill", 'cost': 10}
     
 
     enemies = [ 
@@ -444,11 +429,64 @@ def build_room_4():
     room = Room(start, _exit, enemies, build)
     return room
 
+def build_boss_room_1():
+    start = {'x': 1, 'y': 1}
+
+    _exit = {'x': 1, 'y': 10}
+
+    enemy_weapon = get_weapon('Knuckles Enhanced')
+    enemy_armor = get_armor("Leather Lv.4")
+    enemy_spell = {
+            'name': 'Firepuff',
+            'cost': 10
+        }
+
+    enemies = [
+        Enemy("Hank Hill", 150, 100, 10, 3, enemy_weapon, {
+            'name': 'Firepuff',
+            'cost': 10
+        }, get_armor('none'), {
+            'x': 1,
+            'y': 9
+        }, [{'name': 'Gold', 'value': 50}, {'name': enemy_weapon['name'], 'value': enemy_weapon},
+            {'name': enemy_armor['name'], 'value': enemy_armor}, {'name': enemy_spell['name'], 'value': enemy_spell}])
+    ]
+
+    build = [
+        [2, 5, 2],
+        [2, 0, 2],
+        [2, 0, 2],
+        [2, 0, 2],
+        [2, 0, 2],
+        [2, 0, 2],
+        [2, 0, 2],
+        [2, 0, 2],
+        [2, 0, 2],
+        [2, 4, 2],
+        [2, 3, 2],
+    ]
+
+    room = Room(start, _exit, enemies, build)
+    return room
+
+def load_map():
+
+    room_1 = build_room_1()
+    room_2 = build_room_2()
+    room_3 = build_room_3()
+    room_4 = build_room_4()
+    boss_1 = build_boss_room_1()
+    _map = [room_1, room_2, room_3, room_4, boss_1]
+    return _map
+
 
 def load_armor():
     none = {'name': "none", 'defense': 0}
     leather = {'name': "Leather", 'defense': 1}
-    armors = [none, leather]
+    leather_lv2 ={'name': "Leather Lv.2", 'defense': 1.2}
+    leather_lv3 = {'name': 'Leather Lv.3', 'defense': 1.4}
+    leather_lv4 = {'name': 'Leather Lv.4', 'defense': 1.6}
+    armors = [none, leather, leather_lv2, leather_lv3, leather_lv4]
     return armors
 
 
@@ -462,7 +500,11 @@ def get_armor(name):
 def load_weapons():
     none = {'name': 'none', 'multiplier': 1, 'sharpness': 0}
     broken_dagger = {'name': 'Broken Dagger', 'multiplier': 1.2}
-    weapons = [none, broken_dagger]
+    sm_knife = {'name': 'Small Knife', 'multiplier': 1.4}
+    dagger = {'name': "Dagger", 'multiplier': 1.55}
+    knuckles_lv1 = {'name': 'Knuckles', 'multiplier': 1.20}
+    knuckles_lv2 = {'name': 'Knuckles Enhanced', 'multiplier': 1.65}
+    weapons = [none, broken_dagger, sm_knife, dagger, knuckles_lv1, knuckles_lv2]
     return weapons
 
 
@@ -490,6 +532,15 @@ def rest(player):
 def load_spells():
     firepuff = {'name': 'Firepuff', 'cost': 10}
     ice_chill = {'name': "Ice-Chill", 'cost': 10}
+    heal = {'name': 'Blessing', 'cost': 10}
+    spells = [firepuff, ice_chill, heal]
+    return spells
+
+def get_spell(name):
+    spells = load_spells()
+    for spell in spells:
+        if spell['name'] == name:
+            return spell
 
 
 def enemy_decision(enemy, player, state):
