@@ -1,6 +1,7 @@
 from pybcca.tui_helper import run
 from core import *
 import os
+import emoji
 
 
 def check_space_action(state, direction):
@@ -93,6 +94,7 @@ def battle_update(key, state: Game) -> Game:
 
     if state.enemy.is_dead():
         state.state = 'loot_menu'
+
     elif state.player.is_dead():
         state.state = 'game-over'
     return state
@@ -152,31 +154,24 @@ def remove_weapon_update(key, state):
 def remove_armor_update(key, state):
     if key == '1':
         remove_item(state.player, 1, 'armors')
-        state.state = "loot_menu"
     elif key == '2':
         remove_item(state.player, 2, 'armors')
-        state.state = "loot_menu"
     elif key == '3':
         remove_item(state.player, 3, 'armors')
-        state.state = "loot_menu"
     elif key == '4':
         remove_item(state.player, 4, 'armors')
-        state.state = "loot_menu"
     elif key == '5':
         remove_item(state.player, 5, 'armors')
-        state.state = "loot_menu"
     elif key == '6':
         remove_item(state.player, 6, 'armors')
-        state.state = "loot_menu"
     elif key == '7':
         remove_item(state.player, 7, 'armors')
-        state.state = "loot_menu"
     elif key == '8':
         remove_item(state.player, 8, 'armors')
-        state.state = "loot_menu"
     elif key == '9':
         remove_item(state.player, 9, 'armors')
-        state.state = "loot_menu"
+    elif key == 'd':
+        state.state = 'loot_menu'
     return state
 
 
@@ -283,17 +278,17 @@ def explore_view(state, x, y):
     for row in state.player.room.build:
         for cell in row:
             if cell == 0:
-                string += "   "
+                string += "  "
             elif cell == 1:
-                string += " P "
+                string += emoji.emojize(":full_moon:")
             elif cell == 2:
-                string += "|W|"
+                string += emoji.emojize(":musical_keyboard:")
             elif cell == 3:
-                string += "[ ]"
+                string += emoji.emojize(":door:")
             elif cell == 4:
-                string += " X "
+                string += emoji.emojize(":skull:")
             elif cell == 5:
-                string += "[ ]"
+                string += emoji.emojize(":door:")
         string += "\n\t"
     return string
 
@@ -350,12 +345,13 @@ def weapon_remove_view(state, x, y):
 def armor_remove_view(state, x, y):
     string = "Choose an Armor to remove\n"
     counter = 1
+    controls = "\n[D] Done"
 
     for armor in state.player.inventory['armors'][1:]:
         new_str = f'{counter}: {armor["name"]}\n'
         counter += 1
         string += new_str
-    return string
+    return string + controls
 
 
 def spell_remove_view(state, x, y):
@@ -406,13 +402,13 @@ def loot_view(state, x, y):
     gold = f"[1] Gold: {state.enemy.loot[0]['value']}\n"
     weapon = f"[2] Weapon: {state.enemy.loot[1]['name']}\n"
     armor = f"[3] Armor: {state.enemy.loot[2]['name']}\n"
-    spells = f"[4] Spell: {state.enemy.loot[3]['name']}"
+    spells = f"[4] Spell: {state.enemy.loot[3]['name']}\n"
 
     inv = f"\n\n\n{state.player.inventory['armors']}"
 
-    controls = "\n\n\n[D] Done\n[S] Edit Inventory"
+    controls = "\n\n\n[D] Done\t[S] Edit Inventory"
 
-    return string + gold + weapon + armor + spells + inv
+    return string + gold + weapon + armor + spells + controls
 
 
 def view(state, x, y):
@@ -463,7 +459,7 @@ def main():
     player.inventory['armors'].append(get_armor('none'))
     player.inventory['armors'].append(get_armor('Leather'))
 
-    run(Game(player, _map, "explore"), update, view)
+    run(Game(player, _map, "explore", 0), update, view)
 
 
 if __name__ == "__main__":
